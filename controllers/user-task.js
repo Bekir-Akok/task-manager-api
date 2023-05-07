@@ -46,7 +46,7 @@ const approvedTask = async (req, res) => {
 
     if (!isUserExist.task.find((t) => t.id === taskId)) {
       return errHandler(
-        { status: 417, msg: "user does not have this task", status_code: 111 },
+        { status: 417, msg: "user does not have this task", status_code: 110 },
         res
       );
     }
@@ -69,8 +69,8 @@ const approvedTask = async (req, res) => {
 };
 
 const getApprovedTask = async (req, res) => {
-  const { _id } = req.user;
-
+  const { id: _id } = req.user;
+  console.log(req.user);
   try {
     const isUserExist = await User.findOne({ _id });
 
@@ -112,7 +112,7 @@ const createDoneTask = async (req, res) => {
 
     if (!isUserExist.approvedTask.find((t) => t.id === taskId)) {
       return errHandler(
-        { status: 417, msg: "user does not have this task", status_code: 111 },
+        { status: 417, msg: "user does not have this task", status_code: 110 },
         res
       );
     }
@@ -125,7 +125,7 @@ const createDoneTask = async (req, res) => {
         {
           status: 417,
           msg: "user does not have enough charge",
-          status_code: 112,
+          status_code: 109,
         },
         res
       );
@@ -162,7 +162,7 @@ const createDoneTask = async (req, res) => {
 };
 
 const getDoneTask = async (req, res) => {
-  const { _id } = req.user;
+  const { id: _id } = req.user;
 
   try {
     const isUserExist = await User.findOne({ _id });

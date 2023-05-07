@@ -7,14 +7,19 @@ const withdrawMoney = mongoose.Schema({
     required: true,
   },
 
+  userName: {
+    type: String,
+    required: true,
+  },
   totalValue: {
     type: Number,
     required: true,
   },
 
   status: {
-    type: Boolean,
-    default: false,
+    type: String,
+    default: "Pending",
+    enum: ["Resolve", "Pending", "Reject"],
   },
   created_at: { type: Date, default: Date.now },
 });

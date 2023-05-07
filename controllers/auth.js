@@ -11,7 +11,7 @@ const login = async (req, res) => {
   try {
     const { userName, password } = req.body;
 
-    const user = await User.findOne({ userName }, { _id: 0 });
+    const user = await User.findOne({ userName });
     if (!user) {
       return errHandler(
         { status: 417, msg: "user does not exist", status_code: 101 },
@@ -69,7 +69,7 @@ const register = async (req, res) => {
 
   try {
     const isUserExist = await User.findOne(
-      { userName, phoneNumber },
+      { $or: [{ userName }, { phoneNumber }] },
       { _id: 0 }
     );
 
@@ -84,7 +84,7 @@ const register = async (req, res) => {
 
     if (!isSuggestionNameExist) {
       return errHandler(
-        { status: 417, msg: "suggestionName doesnt exist", status_code: 107 },
+        { status: 417, msg: "suggestionName doesnt exist", status_code: 103 },
         res
       );
     }

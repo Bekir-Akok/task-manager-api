@@ -21,6 +21,7 @@ const getAllUser = async (req, res) => {
 const updateTaskFromUser = async (req, res) => {
   const { id: _id, taskId } = req.params;
   const { repeatCount } = req.body;
+
   try {
     const user = await User.findOne({ _id });
     if (!user) {
@@ -51,7 +52,7 @@ const updateTaskFromUser = async (req, res) => {
 };
 
 const deleteTaskFromUser = async (req, res) => {
-  const { id: _id, taskId } = req.params;
+  const { id: _id, taskId, index } = req.params;
   try {
     const user = await User.findOne({ _id });
     if (!user) {
@@ -61,7 +62,7 @@ const deleteTaskFromUser = async (req, res) => {
       );
     }
 
-    const task = await Task.findOne({ taskId });
+    const task = await Task.findOne({ _id: taskId });
     if (!task) {
       return errHandler(
         { status: 417, msg: "task does not exist", status_code: 107 },
@@ -69,7 +70,7 @@ const deleteTaskFromUser = async (req, res) => {
       );
     }
 
-    user.task = user.task.filter((t) => t.id !== taskId);
+    user.task = user.task.filter((t, i) => i !== Number(index));
 
     await user.save();
 
@@ -91,7 +92,7 @@ const createModeratorUser = async (req, res) => {
   } = req.body;
   try {
     const isUserExist = await User.findOne(
-      { userName, phoneNumber },
+      { $or: [{ userName }, { phoneNumber }] },
       { _id: 0 }
     );
 
@@ -130,9 +131,37 @@ const createModeratorUser = async (req, res) => {
   }
 };
 
+const getAllTaskByUser = async (req, res) => {
+  const { id: _id } = req.params;
+  try {
+    const user = await User.findOne({ _id });
+
+    if (!user) {
+      return errHandler(
+        { status: 417, msg: "user does not exist", status_code: 101 },
+        res
+      );
+    }
+
+    const data = await Promise.all(
+      user.task.map(async (t) => {
+        const task = await Task.findOne({ _id: t?.id });
+
+        return { ...task?._doc, repeatCount: t?.repeatCount };
+      })
+    );
+
+    return res.status(200).json({ msg: "get all user successfuly", data });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ msg: "get all user failure" });
+  }
+};
+
 module.exports = {
   getAllUser,
   updateTaskFromUser,
   deleteTaskFromUser,
   createModeratorUser,
+  getAllTaskByUser,
 };

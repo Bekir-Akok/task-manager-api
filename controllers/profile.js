@@ -5,10 +5,11 @@ const User = require("../models/user");
 const { errHandler } = require("../utils/helper");
 
 const resetPassword = async (req, res) => {
-  const { userName, password, oldPassword } = req.body;
+  const { id: _id } = req.user;
+  const { password, oldPassword } = req.body;
 
   try {
-    const isUserExist = await User.findOne({ userName });
+    const isUserExist = await User.findOne({ _id });
 
     if (!isUserExist) {
       return errHandler(
@@ -43,10 +44,11 @@ const resetPassword = async (req, res) => {
 };
 
 const walletDetail = async (req, res) => {
-  const { userName, accountCode, accountType, securityCode } = req.body;
+  const { id: _id } = req.user;
+  const { nameSurname, accountCode, securityCode } = req.body;
 
   try {
-    const isUserExist = await User.findOne({ userName });
+    const isUserExist = await User.findOne({ _id });
 
     if (!isUserExist) {
       return errHandler(
@@ -55,7 +57,8 @@ const walletDetail = async (req, res) => {
       );
     }
 
-    const securityCodeCorrect = isUserExist.securityCode === securityCode;
+    const securityCodeCorrect =
+      Number(isUserExist.securityCode) === Number(securityCode);
 
     if (!securityCodeCorrect) {
       return errHandler(
@@ -64,7 +67,7 @@ const walletDetail = async (req, res) => {
       );
     }
 
-    isUserExist.accountType = accountType;
+    isUserExist.nameSurname = nameSurname;
     isUserExist.accountCode = accountCode;
 
     await isUserExist.save();
@@ -77,7 +80,7 @@ const walletDetail = async (req, res) => {
 };
 
 const getWalletDetail = async (req, res) => {
-  const { _id } = req.user;
+  const { id: _id } = req.user;
   try {
     const isUserExist = await User.findOne({ _id });
 
@@ -88,8 +91,13 @@ const getWalletDetail = async (req, res) => {
       );
     }
 
-    const { userName, accountCode, accountType, securityCode } = isUserExist;
-    const data = { userName, accountCode, accountType, securityCode };
+    const { userName, accountCode, accountType, nameSurname } = isUserExist;
+    const data = {
+      userName,
+      accountCode,
+      accountType,
+      nameSurname,
+    };
 
     return res.status(200).json({ msg: "get wallet detail successfuly", data });
   } catch (err) {
@@ -99,7 +107,7 @@ const getWalletDetail = async (req, res) => {
 };
 
 const changeSecurityCode = async (req, res) => {
-  const { _id } = req.user;
+  const { id: _id } = req.user;
   const { oldSecurityCode, securityCode } = req.body;
 
   try {
@@ -112,7 +120,8 @@ const changeSecurityCode = async (req, res) => {
       );
     }
 
-    const securityCodeCorrect = isUserExist.securityCode === oldSecurityCode;
+    const securityCodeCorrect =
+      Number(isUserExist.securityCode) === Number(oldSecurityCode);
 
     if (!securityCodeCorrect) {
       return errHandler(

@@ -4,7 +4,7 @@ const SendingMoney = require("../models/sendingMoney");
 const { errHandler } = require("../utils/helper");
 
 const userSend = async (req, res) => {
-  const { _id } = req.user;
+  const { id: _id } = req.user;
   const { senderName, balance } = req.body;
 
   try {

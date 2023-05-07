@@ -20,6 +20,7 @@ const userSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
+  nameSurname: { type: String, required: false },
   securityCode: { type: Number, required: true },
   suggestionName: { type: String, required: false },
   accountType: { type: String, default: "IBAN", enum: ["TRC-20", "IBAN"] },

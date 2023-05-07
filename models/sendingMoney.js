@@ -17,8 +17,9 @@ const sendingMoney = mongoose.Schema({
   },
 
   status: {
-    type: Boolean,
-    default: false,
+    type: String,
+    default: "Pending",
+    enum: ["Resolve", "Pending", "Reject"],
   },
   created_at: { type: Date, default: Date.now },
 });

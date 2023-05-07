@@ -19,7 +19,7 @@ const userWithdraw = async (req, res) => {
 
     if (isUserExist.securityCode !== securityCode) {
       return errHandler(
-        { status: 417, msg: "statusCode does not correct", status_code: 109 },
+        { status: 417, msg: "statusCode does not correct", status_code: 106 },
         res
       );
     }
@@ -28,14 +28,20 @@ const userWithdraw = async (req, res) => {
 
     if (!statament) {
       return errHandler(
-        { status: 417, msg: "user charge not enough", status_code: 110 },
+        { status: 417, msg: "user charge not enough", status_code: 109 },
         res
       );
     }
 
     isUserExist.charge = isUserExist.charge - totalValue;
+
     await isUserExist.save();
-    await WithdrawMoney.create({ user: _id, totalValue });
+
+    await WithdrawMoney.create({
+      user: _id,
+      userName: isUserExist.userName,
+      totalValue,
+    });
 
     return res.status(201).json({ msg: "withdrawMoney create succesfuly" });
   } catch (err) {
@@ -47,7 +53,17 @@ const userWithdraw = async (req, res) => {
 const checkAdminUserWithdraw = async (req, res) => {
   const { data, totalDocs } = res.paginatedResults;
   try {
-    return res.status(200).json({ msg: "request succesfuly", data, totalDocs });
+    const userAdded = await Promise.all(
+      data.map(async (withdraw) => {
+        const { userName } = await User.findOne({ _id: withdraw.user });
+
+        return { ...withdraw, userName };
+      })
+    );
+
+    return res
+      .status(200)
+      .json({ msg: "request succesfuly", data: userAdded, totalDocs });
   } catch (err) {
     console.log(err);
     res.status(400).json({ msg: "request failure" });
