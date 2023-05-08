@@ -158,10 +158,38 @@ const getAllTaskByUser = async (req, res) => {
   }
 };
 
+const userInfoUpdate = async (req, res) => {
+  const { id: _id } = req.params;
+  const { charge, frozen, taskNumber } = req.body;
+
+  try {
+    const user = await User.findOne({ _id });
+
+    if (!user) {
+      return errHandler(
+        { status: 417, msg: "user does not exist", status_code: 101 },
+        res
+      );
+    }
+
+    user.charge = charge;
+    user.frozen = frozen;
+    user.taskNumber = taskNumber;
+
+    await user.save();
+
+    return res.status(200).json({ msg: "update user successfuly" });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ msg: "update user failure" });
+  }
+};
+
 module.exports = {
   getAllUser,
   updateTaskFromUser,
   deleteTaskFromUser,
   createModeratorUser,
   getAllTaskByUser,
+  userInfoUpdate,
 };

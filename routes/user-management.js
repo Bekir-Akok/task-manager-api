@@ -6,6 +6,7 @@ const {
   deleteTaskFromUser,
   createModeratorUser,
   getAllTaskByUser,
+  userInfoUpdate,
 } = require("../controllers/user-management");
 const User = require("../models/user");
 const searchMiddleware = require("../middleware/sort-filter-pagination/search");
@@ -18,8 +19,9 @@ router.use(checkAdminRole);
 
 router.get("/:id", getAllTaskByUser);
 router.get("/", searchMiddleware(User), getAllUser);
-router.put("/:id/:taskId", updateTaskFromUser);
+router.put("/update/:id/:taskId", updateTaskFromUser);
 router.delete("/:id/:taskId/:index", deleteTaskFromUser);
 router.post("/", createModeratorUser);
+router.put("/account/:id", userInfoUpdate);
 
 module.exports = router;
