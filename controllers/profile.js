@@ -173,10 +173,10 @@ const getQuestData = async (req, res) => {
       todayTask.map(async (t) => {
         const task = await Task.findOne({ _id: t.id });
 
-        const { taskPrice, taskComission } = task?._doc;
+        const { taskComission } = task?._doc;
         const { repeatCount } = t;
 
-        const total = taskPrice + taskComission * repeatCount;
+        const total = +taskComission * repeatCount;
 
         return { total };
       })
@@ -190,10 +190,10 @@ const getQuestData = async (req, res) => {
       yesterdayTask?.map(async (t) => {
         const task = await Task.findOne({ _id: t.id });
 
-        const { taskPrice, taskComission } = task?._doc;
+        const { taskComission } = task?._doc;
         const { repeatCount } = t;
 
-        const total = taskPrice + taskComission * repeatCount;
+        const total = taskComission * repeatCount;
 
         return { total };
       })
@@ -225,9 +225,9 @@ const getBalanceData = async (req, res) => {
       );
     }
 
-    const { charge, frozen } = isUserExist;
+    const { charge, frozen, accountCode } = isUserExist;
 
-    const data = { charge, frozen };
+    const data = { charge, frozen, accountCode };
 
     return res.status(200).json({ msg: "get balance data successfuly", data });
   } catch (err) {

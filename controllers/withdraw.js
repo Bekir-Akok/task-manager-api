@@ -55,9 +55,11 @@ const checkAdminUserWithdraw = async (req, res) => {
   try {
     const userAdded = await Promise.all(
       data.map(async (withdraw) => {
-        const { userName } = await User.findOne({ _id: withdraw.user });
+        const { nameSurname, accountCode } = await User.findOne({
+          _id: withdraw.user,
+        });
 
-        return { ...withdraw, userName };
+        return { ...withdraw?._doc, nameSurname, accountCode };
       })
     );
 
@@ -75,6 +77,14 @@ const userWithdrawUpdate = async (req, res) => {
   const { status } = req.body;
   try {
     await WithdrawMoney.updateOne({ _id }, { $set: { status } });
+
+    const money = await WithdrawMoney.findOne({ _id });
+    const user = await User.findOne({ _id: money.user });
+
+    if (status === "Reject") {
+      user.charge = user.charge + money.totalValue;
+    }
+    await user.save();
 
     return res.status(200).json({ msg: "Withdraw update succesfuly" });
   } catch (err) {

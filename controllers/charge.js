@@ -46,9 +46,11 @@ const userSendingUpdate = async (req, res) => {
 
     const user = await User.findOne({ _id: money.user });
 
-    if (!!money.status && !!user) {
+    if (money.status === "Resolve" && !!user) {
       user.charge = user.charge + money.balance;
     }
+
+    await user.save();
 
     return res.status(200).json({ msg: "request succesfuly" });
   } catch (err) {
