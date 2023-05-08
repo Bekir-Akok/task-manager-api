@@ -4,11 +4,11 @@ const WithdrawMoney = require("../models/withdrawMoney");
 const { errHandler } = require("../utils/helper");
 
 const userWithdraw = async (req, res) => {
-  const { _id } = req.user;
+  const { id: _id } = req.user;
   const { totalValue, securityCode } = req.body;
 
   try {
-    const isUserExist = await User.findOne({ _id }, { _id: 0 });
+    const isUserExist = await User.findOne({ _id });
 
     if (!isUserExist) {
       return errHandler(
@@ -17,18 +17,18 @@ const userWithdraw = async (req, res) => {
       );
     }
 
-    if (isUserExist.securityCode !== securityCode) {
+    if (isUserExist.securityCode !== Number(securityCode)) {
       return errHandler(
         { status: 417, msg: "statusCode does not correct", status_code: 106 },
         res
       );
     }
 
-    const statament = isUserExist.charge >= totalValue;
+    const statament = isUserExist.charge >= Number(totalValue);
 
     if (!statament) {
       return errHandler(
-        { status: 417, msg: "user charge not enough", status_code: 109 },
+        { status: 417, msg: "user charge not enough", status_code: 111 },
         res
       );
     }

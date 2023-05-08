@@ -71,7 +71,6 @@ const approvedTask = async (req, res) => {
 
 const getApprovedTask = async (req, res) => {
   const { id: _id } = req.user;
-  console.log(req.user);
   try {
     const isUserExist = await User.findOne({ _id });
 

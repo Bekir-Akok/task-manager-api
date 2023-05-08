@@ -1,3 +1,4 @@
+const User = require("../models/user");
 const WithdrawMoney = require("../models/withdrawMoney");
 const sendingMoney = require("../models/sendingMoney");
 const { errHandler } = require("../utils/helper");
@@ -15,11 +16,18 @@ const getUserWithdraw = async (req, res) => {
         res
       );
     }
+    const find =
+      !!start_date && !!end_date
+        ? {
+            user: _id,
+            created_at: {
+              $gte: start_date,
+              $lte: end_date,
+            },
+          }
+        : { user: _id };
 
-    const data = await WithdrawMoney.findOne({
-      user: _id,
-      created_at: { $gte: start_date, $lte: end_date },
-    });
+    const data = await WithdrawMoney.find(find);
 
     return res.status(200).json({ msg: "get user withdraw successfuly", data });
   } catch (err) {
@@ -42,10 +50,18 @@ const getUserSending = async (req, res) => {
       );
     }
 
-    const data = await sendingMoney.findOne({
-      user: _id,
-      created_at: { $gte: start_date, $lte: end_date },
-    });
+    const find =
+      !!start_date && !!end_date
+        ? {
+            user: _id,
+            created_at: {
+              $gte: start_date,
+              $lte: end_date,
+            },
+          }
+        : { user: _id };
+
+    const data = await sendingMoney.find(find);
 
     return res.status(200).json({ msg: "get user sending successfuly", data });
   } catch (err) {
