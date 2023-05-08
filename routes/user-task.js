@@ -14,9 +14,9 @@ const router = express.Router();
 router.use(verifyToken);
 
 router.get("/", getUserTasks);
-router.put("/take/:taskId", approvedTask);
+router.put("/take/:taskId/:index", approvedTask);
 router.get("/approved", getApprovedTask);
 router.get("/done", getDoneTask);
-router.post("/approved/:taskId", createDoneTask);
+router.post("/approved/:taskId/:index", createDoneTask);
 
 module.exports = router;

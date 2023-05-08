@@ -35,20 +35,26 @@ const login = async (req, res) => {
         userName,
         role,
         phoneNumber,
-        securityCode,
         suggestionName,
         accountType,
         accountCode,
+        taskNumber,
+        nameSurname,
+        charge,
+        frozen,
       } = user;
 
       const selectUser = {
         userName,
         role,
         phoneNumber,
-        securityCode,
         suggestionName,
         accountType,
         accountCode,
+        taskNumber,
+        nameSurname,
+        charge,
+        frozen,
       };
 
       return res.status(200).json({

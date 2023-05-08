@@ -16,4 +16,19 @@ const randomNumberGenarator = (length) => {
   return Number(result);
 };
 
-module.exports = { errHandler, randomNumberGenarator };
+const isThatSameDay = (dateToCheck, date) => {
+  const date1 = new Date(date);
+  const date2 = new Date(dateToCheck);
+
+  if (
+    date2.getDate() === date1.getDate() &&
+    date2.getMonth() === date1.getMonth() &&
+    date2.getFullYear() === date1.getFullYear()
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+module.exports = { errHandler, randomNumberGenarator, isThatSameDay };

@@ -3,6 +3,8 @@ const User = require("../models/user");
 const Task = require("../models/task");
 const { errHandler } = require("../utils/helper");
 
+const createdAt = new Date();
+
 const getUserTasks = async (req, res) => {
   const { id: _id } = req.user;
 
@@ -20,7 +22,7 @@ const getUserTasks = async (req, res) => {
       isUserExist.task.map(async (t) => {
         const approved = await Task.findOne({ _id: t.id });
 
-        return { ...approved, repeatCount: t.repeatCount };
+        return { ...approved?._doc, repeatCount: t.repeatCount };
       })
     );
 
@@ -32,8 +34,8 @@ const getUserTasks = async (req, res) => {
 };
 
 const approvedTask = async (req, res) => {
-  const { _id } = req.user;
-  const { taskId } = req.params;
+  const { id: _id } = req.user;
+  const { taskId, index } = req.params;
   try {
     const isUserExist = await User.findOne({ _id });
 
@@ -51,17 +53,16 @@ const approvedTask = async (req, res) => {
       );
     }
 
-    isUserExist.task = isUserExist.task.filter((t) => t.id !== taskId);
-    isUserExist.approvedTask = [
-      ...isUserExist.approvedTask,
-      ...isUserExist.task.filter((t) => t.id === taskId),
-    ];
+    const newObj = { ...isUserExist.task[index], createdAt };
+
+    isUserExist.approvedTask = [...isUserExist.approvedTask, newObj];
+    isUserExist.task = isUserExist.task.filter((_t, i) => {
+      return i !== Number(index);
+    });
 
     await isUserExist.save();
 
-    return res
-      .status(200)
-      .json({ msg: "apporoved task create successfuly", data });
+    return res.status(200).json({ msg: "apporoved task create successfuly" });
   } catch (err) {
     console.log(err);
     res.status(400).json({ msg: "apporoved task create failure" });
@@ -85,7 +86,11 @@ const getApprovedTask = async (req, res) => {
       isUserExist.approvedTask.map(async (task) => {
         const approved = await Task.findOne({ _id: task.id });
 
-        return { ...approved, repeatCount: task.repeatCount };
+        return {
+          ...approved?._doc,
+          repeatCount: task.repeatCount,
+          createdAt: task.createdAt,
+        };
       })
     );
 
@@ -97,8 +102,8 @@ const getApprovedTask = async (req, res) => {
 };
 
 const createDoneTask = async (req, res) => {
-  const { _id } = req.user;
-  const { taskId } = req.params;
+  const { id: _id } = req.user;
+  const { taskId, index } = req.params;
 
   try {
     const isUserExist = await User.findOne({ _id });
@@ -118,8 +123,11 @@ const createDoneTask = async (req, res) => {
     }
 
     const selectedTask = await Task.findOne({ _id: taskId });
+    const { repeatCount } = isUserExist.approvedTask[index];
 
-    const state = isUserExist.charge >= selectedTask.taskPrice;
+    const state =
+      isUserExist.charge >=
+      Number(selectedTask.taskPrice) * Number(repeatCount);
     if (!state) {
       return errHandler(
         {
@@ -131,30 +139,39 @@ const createDoneTask = async (req, res) => {
       );
     }
 
-    isUserExist.approvedTask = isUserExist.approvedTask.filter(
-      (t) => t.id !== taskId
-    );
-    isUserExist.doneTask = [
-      ...isUserExist.doneTask,
-      ...isUserExist.approvedTask.filter((t) => t.id === taskId),
-    ];
+    const newObj = { ...isUserExist.approvedTask[index], createdAt };
 
-    if (!!isUserExist?.taskNumber && isUserExist?.taskNumber - 1 === 0) {
-      isUserExist.charge = isUserExist.charge + isUserExist.frozen;
+    isUserExist.doneTask = [...isUserExist.doneTask, newObj];
+    isUserExist.approvedTask = isUserExist.approvedTask.filter(
+      (_t, i) => i !== Number(index)
+    );
+
+    if (isUserExist?.taskNumber - 1 === 0) {
+      isUserExist.charge =
+        isUserExist.charge +
+        isUserExist.frozen +
+        Number(selectedTask.taskPrice) +
+        Number(selectedTask.taskComission) * Number(repeatCount);
       isUserExist.frozen = 0;
       isUserExist.taskNumber = 1;
-    } else if (!!isUserExist?.taskNumber && isUserExist?.taskNumber - 1 !== 0) {
-      isUserExist.charge = isUserExist.charge - selectedTask.taskPrice;
+
+      await isUserExist.save();
+    } else if (isUserExist?.taskNumber - 1 !== 0) {
+      isUserExist.charge =
+        isUserExist.charge -
+        Number(selectedTask.taskPrice) * Number(repeatCount);
       isUserExist.frozen =
-        isUserExist.frozen +
-        selectedTask.taskPrice +
-        selectedTask.taskComission;
+        Number(isUserExist.frozen) +
+        Number(selectedTask.taskPrice) +
+        Number(selectedTask.taskComission) * Number(repeatCount);
       isUserExist.taskNumber = isUserExist.taskNumber - 1;
+
+      await isUserExist.save();
     }
 
     await isUserExist.save();
 
-    return res.status(200).json({ msg: "create done task successfuly", data });
+    return res.status(200).json({ msg: "create done task successfuly" });
   } catch (err) {
     console.log(err);
     res.status(400).json({ msg: "create done task failure" });
@@ -178,7 +195,11 @@ const getDoneTask = async (req, res) => {
       isUserExist.doneTask.map(async (task) => {
         const approved = await Task.findOne({ _id: task.id });
 
-        return { ...approved, repeatCount: task.repeatCount };
+        return {
+          ...approved?._doc,
+          repeatCount: task.repeatCount,
+          createdAt: task.createdAt,
+        };
       })
     );
 
