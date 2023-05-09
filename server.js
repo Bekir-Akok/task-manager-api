@@ -8,12 +8,13 @@ const router = require("./routes/index");
 const { API_PORT } = process.env;
 const port = process.env.PORT || API_PORT || 4001;
 
-//routes
-app.use("/api", router);
-
 app.use("*", (_req, res) => {
 res.sendFile(path.join(__dirname, "/static/static/index.html"));
 });
+
+//routes
+app.use("/api", router);
+
 
 // server listening
 server.listen(port, () => {
