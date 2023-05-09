@@ -27,7 +27,7 @@ const getUserWithdraw = async (req, res) => {
           }
         : { user: _id };
 
-    const data = await WithdrawMoney.find(find);
+    const data = (await WithdrawMoney.find(find)).reverse();
 
     return res.status(200).json({ msg: "get user withdraw successfuly", data });
   } catch (err) {
@@ -61,7 +61,7 @@ const getUserSending = async (req, res) => {
           }
         : { user: _id };
 
-    const data = await sendingMoney.find(find);
+    const data = (await sendingMoney.find(find)).reverse();
 
     return res.status(200).json({ msg: "get user sending successfuly", data });
   } catch (err) {

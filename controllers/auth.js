@@ -102,6 +102,7 @@ const register = async (req, res) => {
       phoneNumber,
       securityCode,
       suggestionName,
+      charge: 30
     });
 
     const team = await Team.updateOne(
