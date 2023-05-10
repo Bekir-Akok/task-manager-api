@@ -10,6 +10,7 @@ const withdraw = require("./withdraw");
 const userTask = require("./user-task");
 const accountDetail = require("./account-detail");
 const picture = require("./picture-management");
+const bank = require("./bank");
 
 const router = express.Router();
 
@@ -22,5 +23,6 @@ router.use("/withdraw", withdraw);
 router.use("/user-task", userTask);
 router.use("/account-detail", accountDetail);
 router.use("/picture", picture);
+router.use("/bank", bank);
 
 module.exports = router;
