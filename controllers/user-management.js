@@ -172,6 +172,13 @@ const userInfoUpdate = async (req, res) => {
       );
     }
 
+    if (!taskNumber >= 1) {
+      return errHandler(
+        { status: 417, msg: "user does not exist", status_code: 112 },
+        res
+      );
+    }
+
     user.charge = charge;
     user.frozen = frozen;
     user.taskNumber = taskNumber;

@@ -149,20 +149,19 @@ const createDoneTask = async (req, res) => {
       isUserExist.charge =
         isUserExist.charge +
         isUserExist.frozen +
-        Number(selectedTask.taskPrice) +
         Number(selectedTask.taskComission) * Number(repeatCount);
       isUserExist.frozen = 0;
       isUserExist.taskNumber = 1;
 
       await isUserExist.save();
     } else if (isUserExist?.taskNumber - 1 !== 0) {
-      isUserExist.charge =
-        isUserExist.charge -
-        Number(selectedTask.taskPrice) * Number(repeatCount);
-      isUserExist.frozen =
-        Number(isUserExist.frozen) +
-        Number(selectedTask.taskPrice) +
-        Number(selectedTask.taskComission) * Number(repeatCount);
+      const x = Number(selectedTask.taskPrice) * Number(repeatCount);
+      const y = Number(selectedTask.taskComission) * Number(repeatCount);
+
+      isUserExist.charge = Number(isUserExist.charge) - x;
+
+      isUserExist.frozen = Number(isUserExist.frozen) + x + y;
+
       isUserExist.taskNumber = isUserExist.taskNumber - 1;
 
       await isUserExist.save();
@@ -191,15 +190,17 @@ const getDoneTask = async (req, res) => {
     }
 
     const data = await Promise.all(
-      isUserExist.doneTask.map(async (task) => {
-        const approved = await Task.findOne({ _id: task.id });
+      isUserExist.doneTask
+        .map(async (task) => {
+          const approved = await Task.findOne({ _id: task.id });
 
-        return {
-          ...approved?._doc,
-          repeatCount: task.repeatCount,
-          createdAt: task.createdAt,
-        };
-      })
+          return {
+            ...approved?._doc,
+            repeatCount: task.repeatCount,
+            createdAt: task.createdAt,
+          };
+        })
+        .reverse()
     );
 
     return res.status(200).json({ msg: "get done task successfuly", data });

@@ -176,7 +176,7 @@ const getQuestData = async (req, res) => {
         const { taskComission } = task?._doc;
         const { repeatCount } = t;
 
-        const total = +taskComission * repeatCount;
+        const total = taskComission * repeatCount;
 
         return { total };
       })

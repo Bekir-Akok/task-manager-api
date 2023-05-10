@@ -21,6 +21,7 @@ const createTask = async (req, res) => {
       taskPrice,
       taskComission,
       taskPhoto: fileUrl,
+      status: "true",
     });
 
     return res.status(200).json({ msg: "create task successfuly" });
@@ -33,7 +34,7 @@ const createTask = async (req, res) => {
 const deleteTask = async (req, res) => {
   const { id: _id } = req.params;
   try {
-    await Task.deleteOne({ _id });
+    await Task.updateOne({ _id }, { $set: { status: "false" } });
 
     return res.status(200).json({ msg: "delete task successfuly" });
   } catch (err) {

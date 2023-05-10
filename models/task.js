@@ -18,6 +18,11 @@ const taskSchema = mongoose.Schema({
   taskPhoto: {
     type: String,
   },
+  status: {
+    type: String,
+    default: "true",
+    enum: ["true", "false"],
+  },
   created_at: { type: Date, default: Date.now },
 });
 
