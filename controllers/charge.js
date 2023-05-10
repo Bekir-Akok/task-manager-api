@@ -5,7 +5,7 @@ const { errHandler } = require("../utils/helper");
 
 const userSend = async (req, res) => {
   const { id: _id } = req.user;
-  const { senderName, balance } = req.body;
+  const { senderName, balance, code } = req.body;
 
   try {
     const isUserExist = await User.findOne({ _id }, { _id: 0 });
@@ -17,7 +17,7 @@ const userSend = async (req, res) => {
       );
     }
 
-    await SendingMoney.create({ user: _id, senderName, balance });
+    await SendingMoney.create({ user: _id, senderName, balance, code });
 
     return res.status(201).json({ msg: "request succesfuly" });
   } catch (err) {

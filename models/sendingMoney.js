@@ -15,6 +15,10 @@ const sendingMoney = mongoose.Schema({
     type: Number,
     required: true,
   },
+  code: {
+    type: Number,
+    required: true,
+  },
 
   status: {
     type: String,
