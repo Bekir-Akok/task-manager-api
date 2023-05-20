@@ -192,6 +192,30 @@ const userInfoUpdate = async (req, res) => {
   }
 };
 
+const userChangePassword = async (req, res) => {
+  const { id: _id } = req.params;
+  const { password } = req.body;
+  try {
+    const user = await User.findOne({ _id });
+
+    if (!user) {
+      return errHandler(
+        { status: 417, msg: "user does not exist", status_code: 101 },
+        res
+      );
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+
+    await user.save();
+
+    return res.status(200).json({ msg: "req succes" });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ msg: "update user failure" });
+  }
+};
+
 module.exports = {
   getAllUser,
   updateTaskFromUser,
@@ -199,4 +223,5 @@ module.exports = {
   createModeratorUser,
   getAllTaskByUser,
   userInfoUpdate,
+  userChangePassword,
 };
