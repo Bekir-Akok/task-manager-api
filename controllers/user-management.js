@@ -172,9 +172,6 @@ const userInfoUpdate = async (req, res) => {
 
   try {
     const user = await User.findOne({ _id });
-    const isUniqe = await User.findOne({
-      $or: [{ userName }, { phoneNumber }],
-    });
 
     if (!user) {
       return errHandler(
@@ -185,17 +182,6 @@ const userInfoUpdate = async (req, res) => {
 
     if (!taskNumber >= 1) {
       return errHandler({ status: 417, msg: "", status_code: 112 }, res);
-    }
-
-    if (isUniqe.length >= 1) {
-      return errHandler(
-        {
-          status: 417,
-          msg: "username phonenumber must be uniqe",
-          status_code: 113,
-        },
-        res
-      );
     }
 
     user.charge = charge;
@@ -211,7 +197,7 @@ const userInfoUpdate = async (req, res) => {
     return res.status(200).json({ msg: "update user successfuly" });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ msg: "update user failure" });
+    res.status(400).json({ msg: "update user failure", status_code: 113 });
   }
 };
 
