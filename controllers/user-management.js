@@ -160,10 +160,21 @@ const getAllTaskByUser = async (req, res) => {
 
 const userInfoUpdate = async (req, res) => {
   const { id: _id } = req.params;
-  const { charge, frozen, taskNumber } = req.body;
+  const {
+    charge,
+    frozen,
+    taskNumber,
+    userName,
+    phoneNumber,
+    securityCode,
+    suggestionName,
+  } = req.body;
 
   try {
     const user = await User.findOne({ _id });
+    const isUniqe = await User.findOne({
+      $or: [{ userName }, { phoneNumber }],
+    });
 
     if (!user) {
       return errHandler(
@@ -173,8 +184,16 @@ const userInfoUpdate = async (req, res) => {
     }
 
     if (!taskNumber >= 1) {
+      return errHandler({ status: 417, msg: "", status_code: 112 }, res);
+    }
+
+    if (isUniqe.length >= 1) {
       return errHandler(
-        { status: 417, msg: "user does not exist", status_code: 112 },
+        {
+          status: 417,
+          msg: "username phonenumber must be uniqe",
+          status_code: 113,
+        },
         res
       );
     }
@@ -182,6 +201,10 @@ const userInfoUpdate = async (req, res) => {
     user.charge = charge;
     user.frozen = frozen;
     user.taskNumber = taskNumber;
+    user.userName = userName;
+    user.phoneNumber = phoneNumber;
+    user.securityCode = securityCode;
+    user.suggestionName = suggestionName;
 
     await user.save();
 
